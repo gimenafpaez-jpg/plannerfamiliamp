@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!-- saved from url=(0092)file:///C:/Users/gimen/OneDrive/Documentos/PERSONAL/Planner%20Familiar%20-%20Mini%20App.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planner Familiar - Mini App</title>
+<link href="./Planner Familiar - Mini App_files/css2" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f9fc; --card:#ffffff; --muted:#6b7280;
+    --accent:#2563eb; --mama:#60A5FA; --papa:#A78BFA;
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+  body{margin:0;background:linear-gradient(180deg,#f3f7fb 0%, var(--bg) 100%);color:#0f172a}
+  .container{max-width:1100px;margin:28px auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  h1{margin:0;font-size:20px;color:var(--accent)}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid #dbeafe}
+  .layout{display:grid;grid-template-columns:1fr 360px;gap:18px}
+  .panel{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+  .section-title{font-size:14px;color:#0b3b71;margin-bottom:8px;font-weight:700}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .card{background:linear-gradient(180deg,#fff,#fbfdff);border-radius:10px;padding:12px;border:1px solid #eef2ff}
+  .card .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .task-title{font-weight:600;margin:0;font-size:14px;cursor:pointer}
+  .task-input{font-weight:600;font-size:14px;padding:4px 6px;width:100%;border:1px solid #d1d5db;border-radius:6px}
+  .meta{font-size:12px;color:var(--muted)}
+  .row{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .pill-btn{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;user-select:none;border:1px solid transparent;opacity:0.6}
+  .pill-btn.active{opacity:1;box-shadow:0 0 0 2px #00000020 inset}
+  .resp-mama{background:var(--mama);color:white}
+  .resp-papa{background:var(--papa);color:white}
+  input[type="date"], input[type="time"]{padding:4px 6px;border:1px solid #d1d5db;border-radius:6px;font-size:12px}
+  .small{font-size:12px;color:var(--muted)}
+  .list-empty{text-align:center;padding:28px;color:var(--muted);font-size:14px}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>Planner Familiar</h1>
+      <div class="small">Tareas fijas y semanales — guarda automático en tu navegador</div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="addFixedBtn">+ Tarea fija</button>
+      <button class="btn" id="addWeekBtn">+ Tarea semanal</button>
+      <button class="btn ghost" id="resetBtn">Resetear</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <section class="panel" aria-labelledby="fixedTitle">
+        <div class="section-title" id="fixedTitle">Tareas fijas</div>
+        <div class="cards" id="fixedList"><div class="card"><div class="top"><div class="task-title">Preparar lonchera</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama">Mamá</div><div class="pill-btn resp-papa active">Papá ✔️</div></div></div><div class="card"><div class="top"><div class="task-title">llevar al colegio</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">chequear whatsapp y cuadernos</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">baño</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">comprar necesidades del colegio</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">retirar del colegio- mediodia- tarde</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">atencion exclusiva de 16:30 a 20:30</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">prepara mochilas de natacion y deportes</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">hacer pagos de impuestos</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">Supermercado</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">vestir mañana</div><div class="meta">Fija</div></div><div class="row"><div class="pill-btn resp-mama">Mamá</div><div class="pill-btn resp-papa active">Papá ✔️</div></div></div></div>
+        <div id="fixedEmpty" class="list-empty" style="display: none;">No hay tareas fijas — añadí una.</div>
+      </section>
+
+      <section style="height:18px"></section>
+
+      <section class="panel" aria-labelledby="weekTitle">
+        <div class="section-title" id="weekTitle">Tareas por semana (lunes - viernes)</div>
+        <div class="cards" id="weekList"><div class="card"><div class="top"><div class="task-title">odontologo Janna</div><div class="meta"></div></div><div class="row"><input type="date"><input type="time"></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">psico Mia</div><div class="meta"></div></div><div class="row"><input type="date"><input type="time"></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">taller de lectura Mía</div><div class="meta"></div></div><div class="row"><input type="date"><input type="time"></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">Expo Arte Janna</div><div class="meta"></div></div><div class="row"><input type="date"><input type="time"></div><div class="row"><div class="pill-btn resp-mama">Mamá</div><div class="pill-btn resp-papa active">Papá ✔️</div></div></div><div class="card"><div class="top"><div class="task-title">expo arte Rocco</div><div class="meta"></div></div><div class="row"><input type="date"><input type="time"></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div><div class="card"><div class="top"><div class="task-title">Di meglio Rocco</div><div class="meta"></div></div><div class="row"><input type="date"><input type="time"></div><div class="row"><div class="pill-btn resp-mama active">Mamá ✔️</div><div class="pill-btn resp-papa">Papá</div></div></div></div>
+        <div id="weekEmpty" class="list-empty" style="display: none;">No hay tareas para esta semana — añadí una.</div>
+      </section>
+    </main>
+
+    <aside class="panel">
+      <div class="section-title">Resumen</div>
+      <canvas id="donut" width="415" height="415" style="display: block; box-sizing: border-box; height: 332px; width: 332px;"></canvas>
+      <div class="small">Mamá / Papá — distribución de tareas</div>
+    </aside>
+  </div>
+</div>
+
+<script src="./Planner Familiar - Mini App_files/chart.js.descarga"></script>
+<script>
+const STORAGE_KEY = "planner_familiar_v5";
+
+function genId(){ return 't'+Math.random().toString(36).slice(2,9); }
+function formatDate(d){return d.toISOString().split("T")[0];}
+function startOfWeek(d){const date=new Date(d);const day=date.getDay();const diff=(day+6)%7;date.setDate(date.getDate()-diff);date.setHours(0,0,0,0);return date;}
+function getWeekDates(){const now=new Date();const mon=startOfWeek(now);return [...Array(5)].map((_,i)=>{const dt=new Date(mon);dt.setDate(mon.getDate()+i);return dt;});}
+
+let data = loadData();
+function loadData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){try{return JSON.parse(raw);}catch{}}
+  const weekDates = getWeekDates();
+  return {fixed:[
+    {id:genId(),title:"Preparar lonchera",responsable:"Mamá"}
+  ],week:[
+    {id:genId(),date:formatDate(weekDates[0]),time:"08:00",title:"Reunión con maestros",responsable:"Papá"},
+    {id:genId(),date:formatDate(weekDates[1]),time:"17:00",title:"Revisar tareas de matemáticas",responsable:"Mamá"}
+  ]};
+}
+function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data));updateUI();}
+
+// chart
+const ctx=document.getElementById('donut').getContext('2d');
+const chart=new Chart(ctx,{type:'doughnut',data:{labels:['Mamá','Papá'],datasets:[{data:[0,0],backgroundColor:['#60A5FA','#A78BFA'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:function(ctx){let total=ctx.dataset.data.reduce((a,b)=>a+b,0);let val=ctx.raw;let pct=total?Math.round(val*100/total):0;return ctx.label+": "+pct+"% ("+val+")";}}}}}});
+
+function makeCard(item,isFixed=false){
+  const card=document.createElement('div');card.className='card';
+  const top=document.createElement('div');top.className='top';
+
+  // Editable title
+  const title=document.createElement('div');
+  title.className='task-title';
+  title.textContent=item.title;
+  title.addEventListener('click',()=>{
+    const input=document.createElement('input');
+    input.type='text';
+    input.value=item.title;
+    input.className='task-input';
+    input.addEventListener('blur',()=>{item.title=input.value;saveData();});
+    input.addEventListener('keydown',(e)=>{if(e.key==='Enter'){input.blur();}});
+    top.replaceChild(input,title);
+    input.focus();
+  });
+
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=isFixed?"Fija":"";
+  top.appendChild(title);top.appendChild(meta);card.appendChild(top);
+
+  // Fecha y hora solo para semanales
+  if(!isFixed){
+    const fhRow=document.createElement('div');fhRow.className='row';
+    const inpDate=document.createElement('input');inpDate.type='date';inpDate.value=item.date||formatDate(new Date());
+    inpDate.addEventListener('change',()=>{item.date=inpDate.value;saveData();});
+    const inpTime=document.createElement('input');inpTime.type='time';inpTime.value=item.time||"08:00";
+    inpTime.addEventListener('change',()=>{item.time=inpTime.value;saveData();});
+    fhRow.appendChild(inpDate);fhRow.appendChild(inpTime);
+    card.appendChild(fhRow);
+  }
+
+  // Responsable buttons
+  const row2=document.createElement('div');row2.className='row';
+  ["Mamá","Papá"].forEach(r=>{
+    const btn=document.createElement('div');
+    btn.className='pill-btn '+(r==="Mamá"?"resp-mama":"resp-papa");
+    if(item.responsable===r) btn.classList.add("active");
+    btn.textContent=r+(item.responsable===r?" ✔️":"");
+    btn.addEventListener('click',()=>{
+      item.responsable=r;
+      saveData();
+    });
+    row2.appendChild(btn);
+  });
+  card.appendChild(row2);
+
+  return card;
+}
+
+function updateUI(){
+  const fixedList=document.getElementById('fixedList');const weekList=document.getElementById('weekList');
+  fixedList.innerHTML='';weekList.innerHTML='';
+  document.getElementById('fixedEmpty').style.display=data.fixed.length?'none':'block';
+  document.getElementById('weekEmpty').style.display=data.week.length?'none':'block';
+  data.fixed.forEach(t=>fixedList.appendChild(makeCard(t,true)));
+  data.week.forEach(t=>weekList.appendChild(makeCard(t,false)));
+  const mama=data.fixed.filter(t=>t.responsable==='Mamá').length+data.week.filter(t=>t.responsable==='Mamá').length;
+  const papa=data.fixed.length+data.week.length-mama;
+  chart.data.datasets[0].data=[mama,papa];chart.update();
+}
+
+// Add new task buttons
+document.getElementById('addFixedBtn').addEventListener('click',()=>{
+  data.fixed.push({id:genId(),title:"Nueva tarea",responsable:"Mamá"});
+  saveData();
+});
+document.getElementById('addWeekBtn').addEventListener('click',()=>{
+  const weekDates=getWeekDates();
+  data.week.push({id:genId(),date:formatDate(weekDates[0]),time:"08:00",title:"Nueva tarea",responsable:"Papá"});
+  saveData();
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(confirm("¿Seguro que querés borrar todas las tareas?")){localStorage.removeItem(STORAGE_KEY);data=loadData();updateUI();}
+});
+
+updateUI();
+</script>
+
+</body></html>
