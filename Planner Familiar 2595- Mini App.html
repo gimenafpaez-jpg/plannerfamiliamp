@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Planner Familiar - Mini App</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f9fc; --card:#ffffff; --muted:#6b7280;
+    --accent:#2563eb; --success:#16a34a; --warning:#f59e0b; --danger:#ef4444;
+    --mama:#60A5FA; --papa:#A78BFA;
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+  body{margin:0;background:linear-gradient(180deg,#f3f7fb 0%, var(--bg) 100%);color:#0f172a}
+  .container{max-width:1100px;margin:28px auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  h1{margin:0;font-size:20px;color:var(--accent)}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .btn{background:var(--accent);color:white;padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid #dbeafe}
+  .layout{display:grid;grid-template-columns:1fr 360px;gap:18px}
+  .panel{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+  .section-title{font-size:14px;color:#0b3b71;margin-bottom:8px;font-weight:700}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .card{background:linear-gradient(180deg,#fff,#fbfdff);border-radius:10px;padding:12px;border:1px solid #eef2ff}
+  .card .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .task-title{font-weight:600;margin:0;font-size:14px;cursor:pointer}
+  .task-input{font-weight:600;font-size:14px;padding:4px 6px;width:100%;border:1px solid #d1d5db;border-radius:6px}
+  .meta{font-size:12px;color:var(--muted)}
+  .row{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .pill-btn{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;user-select:none;border:1px solid transparent}
+  .pill-btn.active{box-shadow:0 0 0 2px #00000020 inset}
+  .p-alta{background:#FFEDED;color:var(--danger)}
+  .p-media{background:#FFF7ED;color:var(--warning)}
+  .p-baja{background:#ECFDF5;color:var(--success)}
+  .resp-mama{background:var(--mama);color:white}
+  .resp-papa{background:var(--papa);color:white}
+  .small{font-size:12px;color:var(--muted)}
+  .list-empty{text-align:center;padding:28px;color:var(--muted);font-size:14px}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>Planner Familiar</h1>
+      <div class="small">Tareas fijas y semanales — guarda automático en tu navegador</div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="addFixedBtn">+ Tarea fija</button>
+      <button class="btn" id="addWeekBtn">+ Tarea semanal</button>
+      <button class="btn ghost" id="resetBtn">Resetear</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main>
+      <section class="panel" aria-labelledby="fixedTitle">
+        <div class="section-title" id="fixedTitle">Tareas fijas</div>
+        <div class="cards" id="fixedList"></div>
+        <div id="fixedEmpty" class="list-empty">No hay tareas fijas — añadí una.</div>
+      </section>
+
+      <section style="height:18px"></section>
+
+      <section class="panel" aria-labelledby="weekTitle">
+        <div class="section-title" id="weekTitle">Tareas por semana (lunes - viernes)</div>
+        <div class="cards" id="weekList"></div>
+        <div id="weekEmpty" class="list-empty">No hay tareas para esta semana — añadí una.</div>
+      </section>
+    </main>
+
+    <aside class="panel">
+      <div class="section-title">Resumen</div>
+      <canvas id="donut" width="280" height="240"></canvas>
+      <div class="small">Mamá / Papá — distribución de tareas</div>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const STORAGE_KEY = "planner_familiar_v4";
+
+function genId(){ return 't'+Math.random().toString(36).slice(2,9); }
+function formatDate(d){return d.toLocaleDateString();}
+function startOfWeek(d){const date=new Date(d);const day=date.getDay();const diff=(day+6)%7;date.setDate(date.getDate()-diff);date.setHours(0,0,0,0);return date;}
+function getWeekDates(){const now=new Date();const mon=startOfWeek(now);return [...Array(5)].map((_,i)=>{const dt=new Date(mon);dt.setDate(mon.getDate()+i);return dt;});}
+
+let data = loadData();
+function loadData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){try{return JSON.parse(raw);}catch{}}
+  const weekDates = getWeekDates();
+  return {fixed:[
+    {id:genId(),title:"Preparar lonchera",priority:"Alta",responsable:"Mamá"},
+    {id:genId(),title:"Leer con los niños",priority:"Baja",responsable:"Mamá"}
+  ],week:[
+    {id:genId(),date:formatDate(weekDates[0]),title:"Reunión con maestros",priority:"Alta",responsable:"Papá"},
+    {id:genId(),date:formatDate(weekDates[1]),title:"Revisar tareas de matemáticas",priority:"Media",responsable:"Mamá"}
+  ]};
+}
+function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data));updateUI();}
+
+// chart
+const ctx=document.getElementById('donut').getContext('2d');
+const chart=new Chart(ctx,{type:'doughnut',data:{labels:['Mamá','Papá'],datasets:[{data:[0,0],backgroundColor:['#60A5FA','#A78BFA'],borderWidth:0}]},options:{plugins:{legend:{position:'bottom'}}}});
+
+function makeCard(item,isFixed=false){
+  const card=document.createElement('div');card.className='card';
+  const top=document.createElement('div');top.className='top';
+
+  // Editable title
+  const title=document.createElement('div');
+  title.className='task-title';
+  title.textContent=item.title;
+  title.addEventListener('click',()=>{
+    const input=document.createElement('input');
+    input.type='text';
+    input.value=item.title;
+    input.className='task-input';
+    input.addEventListener('blur',()=>{item.title=input.value;saveData();});
+    input.addEventListener('keydown',(e)=>{if(e.key==='Enter'){input.blur();}});
+    top.replaceChild(input,title);
+    input.focus();
+  });
+
+  const meta=document.createElement('div');meta.className='meta';meta.textContent=isFixed?"Fija":item.date;
+  top.appendChild(title);top.appendChild(meta);card.appendChild(top);
+
+  // Priority buttons
+  const row=document.createElement('div');row.className='row';
+  ["Alta","Media","Baja"].forEach(p=>{
+    const btn=document.createElement('div');
+    btn.className='pill-btn '+(p==="Alta"?"p-alta":p==="Media"?"p-media":"p-baja");
+    if(item.priority===p) btn.classList.add("active");
+    btn.textContent=p;
+    btn.addEventListener('click',()=>{
+      item.priority=p;
+      saveData();
+    });
+    row.appendChild(btn);
+  });
+  card.appendChild(row);
+
+  // Responsable buttons
+  const row2=document.createElement('div');row2.className='row';
+  ["Mamá","Papá"].forEach(r=>{
+    const btn=document.createElement('div');
+    btn.className='pill-btn '+(r==="Mamá"?"resp-mama":"resp-papa");
+    if(item.responsable===r) btn.classList.add("active");
+    btn.textContent=r;
+    btn.addEventListener('click',()=>{
+      item.responsable=r;
+      saveData();
+    });
+    row2.appendChild(btn);
+  });
+  card.appendChild(row2);
+
+  return card;
+}
+
+function updateUI(){
+  const fixedList=document.getElementById('fixedList');const weekList=document.getElementById('weekList');
+  fixedList.innerHTML='';weekList.innerHTML='';
+  document.getElementById('fixedEmpty').style.display=data.fixed.length?'none':'block';
+  document.getElementById('weekEmpty').style.display=data.week.length?'none':'block';
+  data.fixed.forEach(t=>fixedList.appendChild(makeCard(t,true)));
+  data.week.forEach(t=>weekList.appendChild(makeCard(t,false)));
+  const mama=data.fixed.filter(t=>t.responsable==='Mamá').length+data.week.filter(t=>t.responsable==='Mamá').length;
+  const papa=data.fixed.length+data.week.length-mama;
+  chart.data.datasets[0].data=[mama,papa];chart.update();
+}
+
+// Add new task buttons
+document.getElementById('addFixedBtn').addEventListener('click',()=>{
+  data.fixed.push({id:genId(),title:"Nueva tarea",priority:"Media",responsable:"Mamá"});
+  saveData();
+});
+document.getElementById('addWeekBtn').addEventListener('click',()=>{
+  const weekDates=getWeekDates();
+  data.week.push({id:genId(),date:formatDate(weekDates[new Date().getDay()-1]||weekDates[0]),title:"Nueva tarea",priority:"Media",responsable:"Papá"});
+  saveData();
+});
+document.getElementById('resetBtn').addEventListener('click',()=>{
+  if(confirm("¿Seguro que querés borrar todas las tareas?")){localStorage.removeItem(STORAGE_KEY);data=loadData();updateUI();}
+});
+
+updateUI();
+</script>
+</body>
+</html>
